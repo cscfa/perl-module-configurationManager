@@ -1,6 +1,7 @@
 package Explorer;
 use strict;
-use warnings;
+#use warnings;
+use Cwd;
 
 use ParameterException;
 use DirectoryException;
@@ -194,21 +195,23 @@ sub getDirectoryContent
 	my $allowDirectory = !(defined $args->{"withoutDirectory"});
 	my $allowFile = !(defined $args->{"withoutFile"});
 	
-	opendir(my $dh, $args->{"directory"}) || die DirectoryException->new({
-		message => "directory parameter must be readable for Explorer::getDirectoryContent. Given : ".$args->{"directory"},
-		code => "1d1572fb2",
+	my $dir = cwd();
+	chdir $args->{"directory"} or die ParameterException->new({
+		message => "directory parameter must allow chdir for Explorer::getDirectoryContent. Given : ".$args->{"directory"},
+		code => "1d1572fb1",
 	});
 	
+	my @file_list = glob("*");
+
 	my $result;
 	$result->{file} = [];
 	$result->{directory} = [];
-	while(readdir $dh) {
-		my $f = $_;
+	foreach my $f (@file_list) {
 		if (!($f =~ /^\./)) {
 			if (-f $args->{"directory"} . "/" . $f) {
 				if ($f =~ /$filePattern/) {
 					if ($allowFile) {
-						push($result->{file}, $f);
+						push(@{$result->{file}}, $f);
 					}
 				}
 			}
@@ -218,17 +221,14 @@ sub getDirectoryContent
 			if (-d $args->{"directory"} . "/" . $f) {
 				if ($f =~ /$dirPattern/) {
 					if ($allowDirectory) {
-						push($result->{directory}, $f);
+						push(@{$result->{directory}}, $f);
 					}
 				}
 			}
 		}
 	}
 	
-	closedir $dh || die DirectoryException->new({
-		message => "directory parameter must be closeable for Explorer::getDirectoryContent.",
-		code => "1d1572fb3",
-	});
+	chdir $dir;
 	
 	return $result;
 }
