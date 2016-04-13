@@ -1,13 +1,6 @@
 package ConfigurationContainer;
 use strict;
 use warnings;
-use FindBin;
-
-BEGIN
-{
-	push(@INC, "$FindBin::Bin/configurationManagerLib/Exception");
-	push(@INC, "$FindBin::Bin/configurationManagerLib/Explorer");
-}
 
 use ParameterException;
 use Explorer;
@@ -19,7 +12,7 @@ sub new
 	
 	my $self = bless {}, $class;
 	
-	foreach my $argKey (keys($args)) {
+	foreach my $argKey (keys(%{$args})) {
 		$self->{$argKey} = $args->{$argKey};
 	}
 	

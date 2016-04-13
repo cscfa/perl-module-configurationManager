@@ -11,7 +11,7 @@ sub new
 	
 	my $self = bless {}, $class;
 	
-	foreach my $argKey (keys($args)) {
+	foreach my $argKey (keys(%{$args})) {
 		$self->{$argKey} = $args->{$argKey};
 	}
 	

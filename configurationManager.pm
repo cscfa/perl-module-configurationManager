@@ -1,7 +1,6 @@
 package configurationManager;
 use strict;
 use warnings;
-use FindBin;
 use Getopt::Long qw(GetOptions);
 Getopt::Long::Configure qw(pass_through);
 
@@ -12,11 +11,32 @@ GetOptions (
 	"ConfigManager-DebugList" => \$debugList,
 );
 
+my $currentFileDirectory = " ";
 BEGIN
 {
-	push(@INC, "$FindBin::Bin/configurationManagerLib/Container");
-	push(@INC, "$FindBin::Bin/configurationManagerLib/Loader");
-	push(@INC, "$FindBin::Bin/configurationManagerLib/YAML-1.15/lib");
+	foreach my $dir (@INC) {
+		next if (!defined $dir);
+		next if (ref($dir));
+		if (-f $dir."/configurationManager.pm") {
+			$currentFileDirectory = $dir."/";
+			last;
+		}
+	}
+	
+	if ($currentFileDirectory eq " ") {
+		die BaseException->new({
+			message => "configurationManager can't resolve itself dependancy",
+			code => "3a8ddc3b1",
+			previous => undef,
+		});
+	}
+	
+	push(@INC, $currentFileDirectory."/configurationManagerLib/Container");
+	push(@INC, $currentFileDirectory."/configurationManagerLib/Loader");
+	push(@INC, $currentFileDirectory."/configurationManagerLib/YAML-1.15/lib");
+	push(@INC, $currentFileDirectory."/configurationManagerLib/Exception");
+	push(@INC, $currentFileDirectory."/configurationManagerLib/Explorer");
+	push(@INC, $currentFileDirectory."/configurationManagerLib");
 }
 
 use ConfigurationContainer;
@@ -30,9 +50,10 @@ sub new
 	
 	my $self = bless {}, $class;
 	
-	foreach my $argKey (keys($args)) {
+	foreach my $argKey (keys(%{$args})) {
 		$self->{$argKey} = $args->{$argKey};
 	}
+	
 	if ($self->{"repositories"}) {
 		foreach my $repository (@{$self->{"repositories"}}) {
 			push(@configRepositories, $repository);
@@ -78,6 +99,7 @@ sub import
 
 sub applyMessage
 {
+	my $pkg = shift(@_);
 	my $message = shift(@_);
 	
 	if ($message =~ /^repo=/) {
