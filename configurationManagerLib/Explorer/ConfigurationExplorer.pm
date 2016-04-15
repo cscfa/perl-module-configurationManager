@@ -1,12 +1,12 @@
-package Explorer;
+package ConfigurationExplorer;
 use strict;
-#use warnings;
+use warnings;
 use Cwd;
 
 use ParameterException;
 use DirectoryException;
 
-$Explorer::VERSION = "1.0";
+$ConfigurationExplorer::VERSION = "2.0";
 
 sub new
 {
@@ -23,7 +23,7 @@ sub searchDirectoriesContaining
 	
 	if (!defined $args->{"directories"}) {
 		die ParameterException->new({
-			message => "directories parameter must be given for Explorer::search.",
+			message => "directories parameter must be given for ConfigurationExplorer::search.",
 			code => "075055f31",
 		});
 	}
@@ -33,7 +33,7 @@ sub searchDirectoriesContaining
 	
 	if (defined $args->{"recursive"} and $args->{"recursive"}) {
 		foreach my $directory (@{$args->{"directories"}}) {
-			my @directory = @{Explorer::recursiveSearchDirectoriesContaining($self, {
+			my @directory = @{ConfigurationExplorer::recursiveSearchDirectoriesContaining($self, {
 				directory => $directory,
 				pattern => $pattern
 			})};
@@ -43,7 +43,7 @@ sub searchDirectoriesContaining
 		}
 	} else {
 		foreach my $directory (@{$args->{"directories"}}) {
-			my $tmpResult = Explorer::getDirectoryContent($self, {
+			my $tmpResult = ConfigurationExplorer::getDirectoryContent($self, {
 				directory => $directory,
 				withoutDirectory => 1,
 				pattern => $pattern
@@ -65,14 +65,14 @@ sub recursiveSearchDirectoriesContaining
 	
 	if (!defined $args->{"directory"}) {
 		die ParameterException->new({
-			message => "directory parameter must be given for Explorer::recursiveSearch.",
+			message => "directory parameter must be given for ConfigurationExplorer::recursiveSearch.",
 			code => "36829afc1",
 		});
 	}
 	my $pattern = (defined $args->{"pattern"}) ? $args->{"pattern"} : ".+";
 
 	my @directories;
-	my $tmpResult = Explorer::getDirectoryContent($self, {
+	my $tmpResult = ConfigurationExplorer::getDirectoryContent($self, {
 		directory => $args->{"directory"},
 		pattern => $pattern
 	});
@@ -83,7 +83,7 @@ sub recursiveSearchDirectoriesContaining
 
 	if (@{$tmpResult->{directory}}) {
 		foreach my $recursion (@{$tmpResult->{directory}}){
-			my @recursive = @{Explorer::recursiveSearchDirectoriesContaining($self, {
+			my @recursive = @{ConfigurationExplorer::recursiveSearchDirectoriesContaining($self, {
 				directory => $args->{"directory"}."/".$recursion,
 				pattern => $pattern
 			})};
@@ -103,7 +103,7 @@ sub searchFiles
 	
 	if (!defined $args->{"directories"}) {
 		die ParameterException->new({
-			message => "directories parameter must be given for Explorer::searchFiles.",
+			message => "directories parameter must be given for ConfigurationExplorer::searchFiles.",
 			code => "174e02371",
 		});
 	}
@@ -113,7 +113,7 @@ sub searchFiles
 	
 	if (defined $args->{"recursive"} and $args->{"recursive"}) {
 		foreach my $directory (@{$args->{"directories"}}) {
-			my @resultFiles = @{Explorer::recursiveSearchFiles($self, {
+			my @resultFiles = @{ConfigurationExplorer::recursiveSearchFiles($self, {
 				directory => $directory,
 				pattern => $pattern
 			})};
@@ -123,7 +123,7 @@ sub searchFiles
 		}
 	} else {
 		foreach my $directory (@{$args->{"directories"}}) {
-			my $tmpResult = Explorer::getDirectoryContent($self, {
+			my $tmpResult = ConfigurationExplorer::getDirectoryContent($self, {
 				directory => $directory,
 				pattern => $pattern
 			});
@@ -146,14 +146,14 @@ sub recursiveSearchFiles
 	
 	if (!defined $args->{"directory"}) {
 		die ParameterException->new({
-			message => "directory parameter must be given for Explorer::recursiveSearchFiles.",
+			message => "directory parameter must be given for ConfigurationExplorer::recursiveSearchFiles.",
 			code => "f3608d5a1",
 		});
 	}
 	my $pattern = (defined $args->{"pattern"}) ? $args->{"pattern"} : ".+";
 
 	my @files;
-	my $tmpResult = Explorer::getDirectoryContent($self, {
+	my $tmpResult = ConfigurationExplorer::getDirectoryContent($self, {
 		directory => $args->{"directory"},
 		pattern => $pattern
 	});
@@ -166,12 +166,12 @@ sub recursiveSearchFiles
 
 	if (@{$tmpResult->{directory}}) {
 		foreach my $recursion (@{$tmpResult->{directory}}){
-			my @recursive = @{Explorer::recursiveSearchFiles($self, {
+			my @recursive = @{ConfigurationExplorer::recursiveSearchFiles($self, {
 				directory => $args->{"directory"}."/".$recursion,
 				pattern => $pattern
 			})};
 			foreach my $recursionFile (@recursive) {
-				push(@files, $recursionFile);
+				push(@files, $recursion."/".$recursionFile);
 			}
 		}
 	}
@@ -186,7 +186,7 @@ sub getDirectoryContent
 	
 	if (!defined $args->{"directory"}) {
 		die ParameterException->new({
-			message => "directory parameter must be given for Explorer::getDirectoryContent.",
+			message => "directory parameter must be given for ConfigurationExplorer::getDirectoryContent.",
 			code => "1d1572fb1",
 		});
 	}
@@ -197,7 +197,7 @@ sub getDirectoryContent
 	
 	my $dir = cwd();
 	chdir $args->{"directory"} or die ParameterException->new({
-		message => "directory parameter must allow chdir for Explorer::getDirectoryContent. Given : ".$args->{"directory"},
+		message => "directory parameter must allow chdir for ConfigurationExplorer::getDirectoryContent. Given : ".$args->{"directory"},
 		code => "1d1572fb1",
 	});
 	
@@ -238,8 +238,8 @@ __END__
 
 =begin markdown
 
-# Explorer
-The Explorer package introduce directory exploring.
+# ConfigurationExplorer
+The ConfigurationExplorer package introduce directory exploring.
 
 Use [strict](http://perldoc.perl.org/strict.html)
 Use [warnings](http://perldoc.perl.org/warnings.html)
@@ -258,9 +258,9 @@ No one now
 
 #### New
 
-Base Explorer default constructor
+Base ConfigurationExplorer default constructor
 
-**return:** Explorer
+**return:** ConfigurationExplorer
 
 
 #### searchDirectoriesContaining

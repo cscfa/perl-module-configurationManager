@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use ParameterException;
-use Explorer;
+use ConfigurationExplorer;
 
 sub new
 {
@@ -34,13 +34,14 @@ sub makeList
 {
 	my $self = shift(@_);
 	
-	my $explorer = Explorer->new();
+	my $explorer = ConfigurationExplorer->new();
 	my %configs;
 	
 	foreach my $repository (@{$self->{"repositories"}}) {
 		my $result = $explorer->searchFiles({
 			directories => [$repository],
 			pattern => ".(yaml|yml)\$",
+			recursive => 1,
 		});
 		
 		foreach my $configFile (@{$result}) {
