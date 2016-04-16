@@ -54,14 +54,16 @@ sub new
 		$self->{$argKey} = $args->{$argKey};
 	}
 	
+	my @selfRepositories;
+	push(@selfRepositories, $_) foreach (@configRepositories);
 	if ($self->{"repositories"}) {
 		foreach my $repository (@{$self->{"repositories"}}) {
-			push(@configRepositories, $repository);
+			push(@selfRepositories, $repository);
 		}
 	}
 	
 	$self->{container} = ConfigurationContainer->new({
-		"repositories" => [@configRepositories],
+		"repositories" => [@selfRepositories],
 	});
 	$self->{container}->debug() if $debugList;
 	
