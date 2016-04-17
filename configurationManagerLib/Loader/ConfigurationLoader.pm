@@ -2,7 +2,8 @@ package ConfigurationLoader;
 use strict;
 use warnings;
 use ConfigException;
-use YAML qw/LoadFile/;
+use ConfigurationImporter qw/import/;
+use YAML qw/LoadFile Load/;
 
 sub new
 {
@@ -38,7 +39,14 @@ sub load
 		if ($config->{"loaded"}) {
 			return $config->{"content"};
 		} else {
-			$config->{"content"} = LoadFile($config->{"location"});
+			my $content = LoadFile($config->{"location"});
+			
+			ConfigurationImporter::import({
+				"content" => \$content,
+				"loader" => $self}
+			);
+			
+			$config->{"content"} = $content;
 			$config->{"loaded"} = 1;
 			
 			return $config->{"content"};
