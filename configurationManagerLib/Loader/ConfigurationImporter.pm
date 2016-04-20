@@ -3,6 +3,8 @@ use strict;
 use warnings;
 require Exporter;
 
+$ConfigurationImporter::VERSION = "1.1.1";
+
 sub import
 {
 	no strict 'refs';
@@ -15,7 +17,7 @@ sub import
 	my $content = ${$args->{"content"}};
 	my $loader = $args->{"loader"};
 
-	foreach my $contentKey (keys($content)) {
+	foreach my $contentKey (keys(%{$content})) {
 		next if ($contentKey ne "import");
 		
 		my @importedFiles;;
@@ -29,7 +31,7 @@ sub import
 		foreach my $importedFile (@importedFiles) {
 			my $importedContent = $loader->load($importedFile);
 			
-			foreach my $importedContentKey (keys($importedContent)) {
+			foreach my $importedContentKey (keys(%{$importedContent})) {
 				if (!exists $content->{$importedContentKey}) {
 					$content->{$importedContentKey} = $importedContent->{$importedContentKey};
 				}
